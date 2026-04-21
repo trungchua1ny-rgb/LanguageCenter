@@ -1,1 +1,8 @@
+target/
+.settings/
+.classpath
+.project
+*.class
+.metadata/
+# Bỏ qua file cấu hình chứa mật khẩu thật
 src/main/resources/db.properties
