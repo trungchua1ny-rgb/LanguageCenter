@@ -1,3 +1,0 @@
-db.url=jdbc:mariadb://localhost:3306/language_center
-db.username=root
-db.password=
