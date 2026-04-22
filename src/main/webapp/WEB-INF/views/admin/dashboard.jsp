@@ -14,8 +14,10 @@
 </div>
 
 <div class="row g-3 mb-4">
+  
+  <%-- THẺ KHÓA HỌC (Đã được bọc link) --%>
   <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm h-100">
+    <a href="${pageContext.request.contextPath}/admin/courses" class="card border-0 shadow-sm h-100 text-decoration-none text-dark" style="transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
       <div class="card-body d-flex align-items-center gap-3">
         <div style="width:44px;height:44px;border-radius:12px;background:#e8f0fe; display:flex;align-items:center;justify-content:center;font-size:22px;">📚</div>
         <div>
@@ -23,7 +25,7 @@
           <div class="text-muted" style="font-size:12px">Khóa học</div>
         </div>
       </div>
-    </div>
+    </a>
   </div>
 
   <div class="col-6 col-md-3">
