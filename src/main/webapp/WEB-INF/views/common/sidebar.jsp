@@ -50,12 +50,24 @@
 
   <% if ("admin".equals(s_role)) { %>
   <div class="sidebar-section-label">Quản lý</div>
+  
   <a href="<%= s_contextPath %>/admin/users" class="sidebar-link <%= s_uri.contains("/admin/users") ? "active" : "" %>">
     <i class="bi bi-people"></i> Người dùng
   </a>
+  
+  <%-- 2 menu mới được thêm vào đây --%>
+  <a href="<%= s_contextPath %>/admin/students" class="sidebar-link <%= s_uri.contains("/admin/students") ? "active" : "" %>">
+    <i class="bi bi-person-lines-fill"></i> Quản lý Học viên
+  </a>
+  
   <a href="<%= s_contextPath %>/admin/courses" class="sidebar-link <%= s_uri.contains("/admin/courses") ? "active" : "" %>">
     <i class="bi bi-book"></i> Khóa học
   </a>
+  
+  <a href="<%= s_contextPath %>/admin/enrollments" class="sidebar-link <%= s_uri.contains("/admin/enrollments") ? "active" : "" %>">
+    <i class="bi bi-card-checklist"></i> Duyệt Đăng ký
+  </a>
+
   <a href="<%= s_contextPath %>/admin/classes" class="sidebar-link <%= s_uri.contains("/admin/classes") ? "active" : "" %>">
     <i class="bi bi-door-open"></i> Lớp học
   </a>
