@@ -90,7 +90,10 @@ public class Enrollment {
     
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
-
+    
+    private String endDate;
+    public String getEndDate() { return endDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
     // ═══════════════════════════════════════════════════════════
     // LOGIC QUAN TRỌNG CHO JSP CỦA SINH VIÊN
     // ═══════════════════════════════════════════════════════════
