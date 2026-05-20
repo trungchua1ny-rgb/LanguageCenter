@@ -1,8 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.langcenter.model.User" %>
 <%
-    // Khai báo lại với tên biến khác (s_...) để Eclipse không báo lỗi "cannot be resolved"
-    // và Tomcat cũng không báo lỗi trùng lặp khi gộp file.
     User s_user = (User) session.getAttribute("loggedUser");
     String s_role = (s_user != null) ? s_user.getRole() : "student";
     String s_contextPath = request.getContextPath();
@@ -43,56 +41,105 @@
 
 <nav id="sidebar">
 
-  <div class="sidebar-section-label">Tổng quan</div>
-  <a href="<%= s_contextPath %>/admin/dashboard" class="sidebar-link <%= s_uri.contains("/dashboard") ? "active" : "" %>">
-    <i class="bi bi-grid-1x2"></i> Dashboard
-  </a>
-
+  <%-- ══════════════════════════════════════════ ADMIN ══ --%>
   <% if ("admin".equals(s_role)) { %>
-  <div class="sidebar-section-label">Quản lý</div>
-  
-  <a href="<%= s_contextPath %>/admin/users" class="sidebar-link <%= s_uri.contains("/admin/users") ? "active" : "" %>">
-    <i class="bi bi-people"></i> Người dùng
-  </a>
-  
-  <%-- 2 menu mới được thêm vào đây --%>
-  <a href="<%= s_contextPath %>/admin/students" class="sidebar-link <%= s_uri.contains("/admin/students") ? "active" : "" %>">
-    <i class="bi bi-person-lines-fill"></i> Quản lý Học viên
-  </a>
-  
-  <a href="<%= s_contextPath %>/admin/courses" class="sidebar-link <%= s_uri.contains("/admin/courses") ? "active" : "" %>">
-    <i class="bi bi-book"></i> Khóa học
-  </a>
-  
-  <a href="<%= s_contextPath %>/admin/enrollments" class="sidebar-link <%= s_uri.contains("/admin/enrollments") ? "active" : "" %>">
-    <i class="bi bi-card-checklist"></i> Duyệt Đăng ký
-  </a>
 
-  <a href="<%= s_contextPath %>/admin/classes" class="sidebar-link <%= s_uri.contains("/admin/classes") ? "active" : "" %>">
-    <i class="bi bi-door-open"></i> Lớp học
-  </a>
+    <div class="sidebar-section-label">Tổng quan</div>
+    <a href="<%= s_contextPath %>/admin/dashboard"
+       class="sidebar-link <%= s_uri.contains("/admin/dashboard") ? "active" : "" %>">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </a>
 
+    <div class="sidebar-section-label">Quản lý</div>
+    <a href="<%= s_contextPath %>/admin/users"
+       class="sidebar-link <%= s_uri.contains("/admin/users") ? "active" : "" %>">
+      <i class="bi bi-people"></i> Người dùng
+    </a>
+    <a href="<%= s_contextPath %>/admin/students"
+       class="sidebar-link <%= s_uri.contains("/admin/students") ? "active" : "" %>">
+      <i class="bi bi-person-lines-fill"></i> Học viên
+    </a>
+    <a href="<%= s_contextPath %>/admin/courses"
+       class="sidebar-link <%= s_uri.contains("/admin/courses") ? "active" : "" %>">
+      <i class="bi bi-book"></i> Khóa học
+    </a>
+    <a href="<%= s_contextPath %>/admin/classes"
+       class="sidebar-link <%= s_uri.contains("/admin/classes") ? "active" : "" %>">
+      <i class="bi bi-door-open"></i> Lớp học
+    </a>
+    <a href="<%= s_contextPath %>/admin/enrollments"
+       class="sidebar-link <%= s_uri.contains("/admin/enrollments") ? "active" : "" %>">
+      <i class="bi bi-card-checklist"></i> Duyệt Đăng ký
+    </a>
+
+    <div class="sidebar-section-label">Học vụ</div>
+    <a href="<%= s_contextPath %>/admin/schedules"
+       class="sidebar-link <%= s_uri.contains("/admin/schedules") ? "active" : "" %>">
+      <i class="bi bi-calendar3"></i> Thời khóa biểu
+    </a>
+    <a href="<%= s_contextPath %>/admin/grades"
+       class="sidebar-link <%= s_uri.contains("/admin/grades") ? "active" : "" %>">
+      <i class="bi bi-award"></i> Điểm số
+    </a>
+
+  <%-- ══════════════════════════════════════════ TEACHER ══ --%>
   <% } else if ("teacher".equals(s_role)) { %>
-  <div class="sidebar-section-label">Giảng dạy</div>
-  <a href="<%= s_contextPath %>/teacher/classes" class="sidebar-link <%= s_uri.contains("/teacher/classes") ? "active" : "" %>">
-    <i class="bi bi-door-open"></i> Lớp của tôi
-  </a>
-  <a href="<%= s_contextPath %>/teacher/grades" class="sidebar-link <%= s_uri.contains("/teacher/grades") ? "active" : "" %>">
-    <i class="bi bi-patch-check"></i> Nhập điểm
-  </a>
 
+    <div class="sidebar-section-label">Tổng quan</div>
+    <a href="<%= s_contextPath %>/teacher/dashboard"
+       class="sidebar-link <%= s_uri.contains("/teacher/dashboard") ? "active" : "" %>">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </a>
+
+    <div class="sidebar-section-label">Giảng dạy</div>
+    <a href="<%= s_contextPath %>/teacher/classes"
+       class="sidebar-link <%= s_uri.contains("/teacher/classes") ? "active" : "" %>">
+      <i class="bi bi-door-open"></i> Lớp của tôi
+    </a>
+    <a href="<%= s_contextPath %>/teacher/grades"
+       class="sidebar-link <%= s_uri.contains("/teacher/grades") ? "active" : "" %>">
+      <i class="bi bi-patch-check"></i> Nhập điểm
+    </a>
+
+  <%-- ══════════════════════════════════════════ STUDENT ══ --%>
   <% } else { %>
-  <div class="sidebar-section-label">Học tập</div>
-  <a href="<%= s_contextPath %>/student/courses" class="sidebar-link <%= s_uri.contains("/student/courses") ? "active" : "" %>">
-    <i class="bi bi-book"></i> Khóa học
-  </a>
-  <a href="<%= s_contextPath %>/student/my-classes" class="sidebar-link <%= s_uri.contains("/student/my-classes") ? "active" : "" %>">
-    <i class="bi bi-journal-bookmark"></i> Lớp đã đăng ký
-  </a>
+
+    <div class="sidebar-section-label">Tổng quan</div>
+    <a href="<%= s_contextPath %>/student/dashboard"
+       class="sidebar-link <%= s_uri.contains("/student/dashboard") ? "active" : "" %>">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </a>
+
+    <div class="sidebar-section-label">Học tập</div>
+    <a href="<%= s_contextPath %>/student/courses"
+       class="sidebar-link <%= s_uri.contains("/student/courses") ? "active" : "" %>">
+      <i class="bi bi-book"></i> Khóa học
+    </a>
+    <a href="<%= s_contextPath %>/student/my-classes"
+       class="sidebar-link <%= s_uri.contains("/student/my-classes") ? "active" : "" %>">
+      <i class="bi bi-journal-bookmark"></i> Lớp đã đăng ký
+    </a>
+
+    <div class="sidebar-section-label">Học vụ</div>
+    <a href="<%= s_contextPath %>/student/schedule"
+       class="sidebar-link <%= s_uri.contains("/student/schedule") ? "active" : "" %>">
+      <i class="bi bi-calendar-week"></i> Thời khóa biểu
+    </a>
+    <a href="<%= s_contextPath %>/student/grades"
+       class="sidebar-link <%= s_uri.contains("/student/grades") ? "active" : "" %>">
+      <i class="bi bi-award"></i> Điểm số
+    </a>
+    <a href="<%= s_contextPath %>/student/ai-consult"
+       class="sidebar-link <%= s_uri.contains("/student/ai-consult") ? "active" : "" %>">
+      <i class="bi bi-robot"></i> Tư vấn AI
+    </a>
+
   <% } %>
 
+  <%-- ── CHUNG cho mọi role ──────────────────────────────── --%>
   <div class="sidebar-section-label">Tài khoản</div>
-  <a href="<%= s_contextPath %>/profile" class="sidebar-link <%= s_uri.contains("/profile") ? "active" : "" %>">
+  <a href="<%= s_contextPath %>/profile"
+     class="sidebar-link <%= s_uri.contains("/profile") ? "active" : "" %>">
     <i class="bi bi-person-circle"></i> Hồ sơ cá nhân
   </a>
 
