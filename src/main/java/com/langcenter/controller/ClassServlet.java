@@ -1,7 +1,7 @@
 package com.langcenter.controller;
 
 import com.langcenter.dao.ClassDAO;
-import com.langcenter.model.Class;
+import com.langcenter.model.SchoolClass;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -50,7 +50,7 @@ public class ClassServlet extends HttpServlet {
                 resp.sendRedirect(req.getContextPath() + "/admin/classes?" + msg);
                 return;
             }
-            Class cl = new Class();
+            SchoolClass cl = new SchoolClass();
             cl.setCourseId(Integer.parseInt(req.getParameter("courseId")));
             cl.setClassName(req.getParameter("className"));
             cl.setStartDate(req.getParameter("startDate"));
