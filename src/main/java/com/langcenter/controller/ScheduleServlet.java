@@ -1,6 +1,6 @@
 package com.langcenter.controller;
 
-import com.langcenter.dao.ClassDAO;
+import com.langcenter.dao.GradeDAO;
 import com.langcenter.dao.ScheduleDAO;
 import com.langcenter.model.Schedule;
 
@@ -10,36 +10,23 @@ import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Servlet: ScheduleServlet
- * URL: /admin/schedules
- *
- * GET  /admin/schedules?classId=X              → Xem TKB của lớp đó
- * GET  /admin/schedules                        → Yêu cầu chọn lớp (nếu chưa có classId)
- * POST /admin/schedules?action=add             → Thêm buổi học mới
- * POST /admin/schedules?action=delete          → Xóa 1 buổi học
- *
- * AuthFilter đã đảm bảo chỉ role='admin' vào được /admin/*
- */
 @WebServlet("/admin/schedules")
 public class ScheduleServlet extends HttpServlet {
 
     private final ScheduleDAO scheduleDAO = new ScheduleDAO();
-    private final ClassDAO classDAO = new ClassDAO(); // Khởi tạo ClassDAO để lấy danh sách lớp
+    private final GradeDAO gradeDAO = new GradeDAO(); // Dùng GradeDAO để lấy danh sách lớp an toàn
 
-    // ─── GET ──────────────────────────────────────────────
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
-
         String classIdParam = req.getParameter("classId");
 
-        // 1. Luôn load danh sách lớp học cho dropdown lọc (Phần ông bị thiếu)
-        req.setAttribute("allClasses", classDAO.getAll());
+        // 1. Load danh sách lớp đã có học viên đóng tiền (hiển thị Dropdown)
+        req.setAttribute("allClasses", gradeDAO.getActiveClasses());
 
-        // 2. Luôn load danh sách phòng học cho dropdown form thêm
+        // 2. Load danh sách phòng học cho form thêm
         req.setAttribute("rooms", scheduleDAO.getAllRooms());
 
         if (classIdParam != null && !classIdParam.isEmpty()) {
@@ -52,19 +39,14 @@ public class ScheduleServlet extends HttpServlet {
                 req.setAttribute("errorMsg", "classId không hợp lệ.");
             }
         }
-        // else: không có classId → JSP sẽ hiển thị hướng dẫn chọn lớp
 
-        req.getRequestDispatcher("/WEB-INF/views/admin/schedule-manage.jsp")
-           .forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/admin/schedule-manage.jsp").forward(req, resp);
     }
 
-    // ─── POST ─────────────────────────────────────────────
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
         req.setCharacterEncoding("UTF-8");
-
         String action = req.getParameter("action");
 
         if ("add".equals(action)) {
@@ -76,19 +58,14 @@ public class ScheduleServlet extends HttpServlet {
         }
     }
 
-    // ─── ADD ──────────────────────────────────────────────
-    private void handleAdd(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-
+    private void handleAdd(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String classIdStr = req.getParameter("classId");
         String roomIdStr  = req.getParameter("roomId");
         String day        = req.getParameter("dayOfWeek");
         String start      = req.getParameter("startTime");
         String end        = req.getParameter("endTime");
 
-        // Validate cơ bản
-        if (isBlank(classIdStr) || isBlank(roomIdStr) || isBlank(day)
-                || isBlank(start) || isBlank(end)) {
+        if (isBlank(classIdStr) || isBlank(roomIdStr) || isBlank(day) || isBlank(start) || isBlank(end)) {
             redirect(resp, req, classIdStr, "error=missing_fields");
             return;
         }
@@ -102,13 +79,11 @@ public class ScheduleServlet extends HttpServlet {
             return;
         }
 
-        // Validate giờ: start phải trước end
         if (start.compareTo(end) >= 0) {
             redirect(resp, req, classIdStr, "error=invalid_time");
             return;
         }
 
-        // Kiểm tra conflict phòng học
         if (scheduleDAO.hasConflict(roomId, day, start, end, 0)) {
             redirect(resp, req, classIdStr, "error=room_conflict");
             return;
@@ -116,14 +91,10 @@ public class ScheduleServlet extends HttpServlet {
 
         Schedule sc = new Schedule(classId, roomId, day, start, end);
         boolean ok = scheduleDAO.insert(sc);
-
         redirect(resp, req, classIdStr, ok ? "success=added" : "error=db_fail");
     }
 
-    // ─── DELETE ───────────────────────────────────────────
-    private void handleDelete(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-
+    private void handleDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idStr      = req.getParameter("id");
         String classIdStr = req.getParameter("classId");
 
@@ -131,7 +102,6 @@ public class ScheduleServlet extends HttpServlet {
             redirect(resp, req, classIdStr, "error=missing_id");
             return;
         }
-
         try {
             int id = Integer.parseInt(idStr);
             boolean ok = scheduleDAO.delete(id);
@@ -141,12 +111,10 @@ public class ScheduleServlet extends HttpServlet {
         }
     }
 
-    // ─── HELPER ───────────────────────────────────────────
     private boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
     }
 
-    /** Redirect về trang TKB của lớp (kèm classId nếu có) */
     private void redirect(HttpServletResponse resp, HttpServletRequest req,
                           String classId, String query) throws IOException {
         StringBuilder url = new StringBuilder(req.getContextPath() + "/admin/schedules");

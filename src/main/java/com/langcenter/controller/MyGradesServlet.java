@@ -10,65 +10,67 @@ import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Servlet: MyGradesServlet
- * URL: /student/grades
- *
- * GET /student/grades             → Toàn bộ điểm của student (tất cả lớp)
- * GET /student/grades?classId=X   → Điểm theo lớp cụ thể
- *     (nút "Xem điểm số" trong my-classes.jsp trỏ vào đây với classId)
- *
- * AuthFilter đã đảm bảo chỉ role='student' vào được /student/*
- */
 @WebServlet("/student/grades")
 public class MyGradesServlet extends HttpServlet {
 
     private final GradeDAO gradeDAO = new GradeDAO();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        req.setCharacterEncoding("UTF-8");
-
-        // Lấy student đang login từ session
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        
+        // 1. Lấy user đang đăng nhập từ Session
         User me = (User) req.getSession().getAttribute("loggedUser");
-        if (me == null) {
+        if (me == null || !"student".equals(me.getRole())) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
+        int studentId = me.getId();
+
+        // 2. Lấy danh sách lớp mà student này ĐÃ ĐĂNG KÝ (truyền cho Dropdown)
+        List<String[]> myClasses = gradeDAO.getEnrolledClassesByStudent(studentId);
+        req.setAttribute("myEnrolledClasses", myClasses);
+
+        // 3. Xử lý Lọc theo ClassId hoặc lấy Toàn bộ
         String classIdParam = req.getParameter("classId");
         List<Grade> grades;
-
+        
         if (classIdParam != null && !classIdParam.isEmpty()) {
-            // Xem điểm 1 lớp cụ thể
             try {
                 int classId = Integer.parseInt(classIdParam);
-                grades = gradeDAO.getByStudentAndClass(me.getId(), classId);
+                grades = gradeDAO.getByStudentAndClass(studentId, classId);
                 req.setAttribute("filterClassId", classId);
+
+                // Tìm tên lớp học để hiển thị lên dòng Alert màu xanh
+                for (String[] c : myClasses) {
+                    if (Integer.parseInt(c[0]) == classId) {
+                        req.setAttribute("filterClassName", c[1] + " - " + c[2]);
+                        break;
+                    }
+                }
             } catch (NumberFormatException e) {
-                // classId lỗi → fallback xem toàn bộ
-                grades = gradeDAO.getByStudentId(me.getId());
+                grades = gradeDAO.getByStudentId(studentId);
             }
         } else {
-            // Xem toàn bộ điểm
-            grades = gradeDAO.getByStudentId(me.getId());
+            grades = gradeDAO.getByStudentId(studentId);
         }
 
-        // Tính điểm trung bình (nếu có dữ liệu)
-        double avgScore = 0;
-        if (!grades.isEmpty()) {
-            double total    = grades.stream().mapToDouble(Grade::getScore).sum();
-            double maxTotal = grades.stream().mapToDouble(Grade::getMaxScore).sum();
-            if (maxTotal > 0) avgScore = Math.round((total / maxTotal) * 100.0 * 10.0) / 10.0;
+        req.setAttribute("grades", grades);
+
+        // 4. Tính toán số liệu thống kê hiển thị Card
+        int totalExams = grades.size();
+        double sumScore = 0;
+        double sumMax = 0;
+        for (Grade g : grades) {
+            sumScore += g.getScore();
+            sumMax += g.getMaxScore();
         }
+        
+        int avgScore = (sumMax > 0) ? (int) Math.round((sumScore / sumMax) * 100) : 0;
 
-        req.setAttribute("grades",    grades);
-        req.setAttribute("avgScore",  avgScore);
-        req.setAttribute("totalExams", grades.size());
+        req.setAttribute("totalExams", totalExams);
+        req.setAttribute("avgScore", avgScore);
 
-        req.getRequestDispatcher("/WEB-INF/views/student/my-grades.jsp")
-           .forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/student/my-grades.jsp").forward(req, resp);
     }
 }

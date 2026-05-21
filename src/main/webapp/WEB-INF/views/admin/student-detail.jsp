@@ -1,141 +1,166 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.langcenter.model.User" %>
-<%
-    User s_user = (User) session.getAttribute("loggedUser");
-    String s_role = (s_user != null) ? s_user.getRole() : "student";
-    String s_contextPath = request.getContextPath();
-    String s_uri = request.getRequestURI();
-%>
+<%@ page contentType="text/html;charset=UTF-8" isELIgnored="false" %>
+<%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<style>
-  #sidebar {
-    width: 230px; min-width: 230px; background: #fff;
-    border-right: 1px solid #e3e6f0; display: flex; flex-direction: column;
-    padding: 12px 0; overflow-y: auto;
-  }
-  .sidebar-section-label {
-    font-size: 10px; font-weight: 700; color: #adb5bd;
-    text-transform: uppercase; letter-spacing: 1px; padding: 14px 20px 4px;
-  }
-  .sidebar-link {
-    display: flex; align-items: center; gap: 10px; padding: 9px 20px;
-    font-size: 14px; color: #495057; text-decoration: none;
-    transition: background .15s, color .15s; border-left: 3px solid transparent;
-  }
-  .sidebar-link:hover { background: #f0f4ff; color: #1a73e8; }
-  .sidebar-link.active {
-    background: #e8f0fe; color: #1a73e8; font-weight: 600; border-left-color: #1a73e8;
-  }
-  .sidebar-link i { font-size: 17px; width: 20px; text-align: center; }
-  @media (max-width: 768px) {
-    #sidebar {
-      position: fixed; left: -230px; top: 56px; height: calc(100vh - 56px);
-      z-index: 1025; transition: left .25s; box-shadow: 4px 0 16px rgba(0,0,0,.1);
-    }
-    #sidebar.show { left: 0; }
-  }
-</style>
+<%@ include file="/WEB-INF/views/common/header.jsp" %>
+<%@ include file="/WEB-INF/views/common/sidebar.jsp" %>
 
-<nav id="sidebar">
+<div class="pagetitle">
+  <h1>Chi tiết Học viên</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/dashboard">Home</a></li>
+      <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/students">Học viên</a></li>
+      <li class="breadcrumb-item active">${student.fullName}</li>
+    </ol>
+  </nav>
+</div><!-- End Page Title -->
 
-  <% if ("admin".equals(s_role)) { %>
+<section class="section">
+  <div class="row">
 
-    <div class="sidebar-section-label">Tổng quan</div>
-    <a href="<%= s_contextPath %>/admin/dashboard"
-       class="sidebar-link <%= s_uri.contains("/admin/dashboard") ? "active" : "" %>">
-      <i class="bi bi-grid-1x2"></i> Dashboard
-    </a>
+    <%-- ══ CỘT TRÁI: THÔNG TIN HỌC VIÊN ══ --%>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-body pt-4">
+          <div class="text-center mb-3">
+            <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle text-white fw-bold mb-3"
+                 style="width:72px;height:72px;background:#0d6efd;font-size:28px;">
+              ${student.fullName.substring(0,1).toUpperCase()}
+            </div>
+            <h5 class="fw-bold mb-1">${student.fullName}</h5>
+            <p class="text-muted mb-0" style="font-size:13px">@${student.username}</p>
+            <c:choose>
+              <c:when test="${student.active}">
+                <span class="badge bg-success mt-2">Hoạt động</span>
+              </c:when>
+              <c:otherwise>
+                <span class="badge bg-danger mt-2">Đã khóa</span>
+              </c:otherwise>
+            </c:choose>
+          </div>
 
-    <div class="sidebar-section-label">Quản lý</div>
-    <a href="<%= s_contextPath %>/admin/users"
-       class="sidebar-link <%= s_uri.contains("/admin/users") ? "active" : "" %>">
-      <i class="bi bi-people"></i> Người dùng
-    </a>
-    <a href="<%= s_contextPath %>/admin/students"
-       class="sidebar-link <%= s_uri.contains("/admin/students") ? "active" : "" %>">
-      <i class="bi bi-person-lines-fill"></i> Học viên
-    </a>
-    <a href="<%= s_contextPath %>/admin/courses"
-       class="sidebar-link <%= s_uri.contains("/admin/courses") ? "active" : "" %>">
-      <i class="bi bi-book"></i> Khóa học
-    </a>
-    <a href="<%= s_contextPath %>/admin/classes"
-       class="sidebar-link <%= s_uri.contains("/admin/classes") ? "active" : "" %>">
-      <i class="bi bi-door-open"></i> Lớp học
-    </a>
-    <a href="<%= s_contextPath %>/admin/enrollments"
-       class="sidebar-link <%= s_uri.contains("/admin/enrollments") ? "active" : "" %>">
-      <i class="bi bi-card-checklist"></i> Duyệt Đăng ký
-    </a>
+          <hr>
 
-    <div class="sidebar-section-label">Học vụ</div>
-    <a href="<%= s_contextPath %>/admin/schedules"
-       class="sidebar-link <%= s_uri.contains("/admin/schedules") ? "active" : "" %>">
-      <i class="bi bi-calendar3"></i> Thời khóa biểu
-    </a>
-    <a href="<%= s_contextPath %>/admin/grades"
-       class="sidebar-link <%= s_uri.contains("/admin/grades") ? "active" : "" %>">
-      <i class="bi bi-award"></i> Điểm số
-    </a>
+          <ul class="list-unstyled mb-0" style="font-size:14px">
+            <li class="d-flex align-items-center gap-2 py-2 border-bottom">
+              <i class="bi bi-envelope text-muted"></i>
+              <span>${student.email}</span>
+            </li>
+            <li class="d-flex align-items-center gap-2 py-2 border-bottom">
+              <i class="bi bi-telephone text-muted"></i>
+              <span>
+                <c:choose>
+                  <c:when test="${not empty student.phone}">${student.phone}</c:when>
+                  <c:otherwise class="text-muted">Chưa cập nhật</c:otherwise>
+                </c:choose>
+              </span>
+            </li>
+            <li class="d-flex align-items-center gap-2 py-2 border-bottom">
+              <i class="bi bi-calendar text-muted"></i>
+              <span>Tham gia: <fmt:formatDate value="${student.createdAt}" pattern="dd/MM/yyyy"/></span>
+            </li>
+            <li class="d-flex align-items-center gap-2 py-2">
+              <i class="bi bi-journals text-muted"></i>
+              <span>Đang học <strong>${student.enrollmentCount}</strong> lớp</span>
+            </li>
+          </ul>
 
-  <% } else if ("teacher".equals(s_role)) { %>
+          <div class="mt-3 d-flex gap-2">
+            <form method="POST"
+                  action="${pageContext.request.contextPath}/admin/students"
+                  class="flex-grow-1">
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="id" value="${student.id}">
+              <button type="submit"
+                      class="btn btn-sm w-100 ${student.active ? 'btn-outline-danger' : 'btn-outline-success'}"
+                      onclick="return confirm('${student.active ? 'Khóa' : 'Mở'} tài khoản của ${student.fullName}?')">
+                <i class="bi bi-${student.active ? 'lock' : 'unlock'} me-1"></i>
+                ${student.active ? 'Khóa tài khoản' : 'Mở tài khoản'}
+              </button>
+            </form>
+            <a href="${pageContext.request.contextPath}/admin/students"
+               class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i>
+            </a>
+          </div>
 
-    <div class="sidebar-section-label">Tổng quan</div>
-    <a href="<%= s_contextPath %>/teacher/dashboard"
-       class="sidebar-link <%= s_uri.contains("/teacher/dashboard") ? "active" : "" %>">
-      <i class="bi bi-grid-1x2"></i> Dashboard
-    </a>
+        </div>
+      </div><!-- End Info Card -->
+    </div>
 
-    <div class="sidebar-section-label">Giảng dạy</div>
-    <a href="<%= s_contextPath %>/teacher/classes"
-       class="sidebar-link <%= s_uri.contains("/teacher/classes") ? "active" : "" %>">
-      <i class="bi bi-door-open"></i> Lớp của tôi
-    </a>
-    <a href="<%= s_contextPath %>/teacher/grades"
-       class="sidebar-link <%= s_uri.contains("/teacher/grades") ? "active" : "" %>">
-      <i class="bi bi-patch-check"></i> Nhập điểm
-    </a>
+    <%-- ══ CỘT PHẢI: LỊCH SỬ ĐĂNG KÝ ══ --%>
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title pt-3">Lịch sử đăng ký khóa học</h5>
 
-  <% } else { %>
+          <c:choose>
+            <c:when test="${empty enrollments}">
+              <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                Học viên chưa đăng ký lớp nào.
+              </div>
+            </c:when>
+            <c:otherwise>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-size:14px">
+                  <thead class="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Lớp học</th>
+                      <th>Khóa học</th>
+                      <th>Ngày đăng ký</th>
+                      <th>Học phí</th>
+                      <th>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <c:forEach var="en" items="${enrollments}" varStatus="s">
+                      <tr>
+                        <td class="text-muted">${s.count}</td>
+                        <td>
+                          <span class="badge bg-light text-dark border">${en.className}</span>
+                        </td>
+                        <td>
+                          <div style="font-size:13px">${en.courseName}</div>
+                          <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary"
+                                style="font-size:10px">${en.levelName}</span>
+                        </td>
+                        <td style="font-size:12px" class="text-muted">${en.enrolledDate}</td>
+                        <td class="fw-semibold text-primary" style="font-size:13px">
+                          <fmt:formatNumber value="${en.tuitionFee}" type="number"
+                                            groupingUsed="true" maxFractionDigits="0"/>đ
+                        </td>
+                        <td>
+                          <c:choose>
+                            <c:when test="${en.paymentStatus == 'pending'}">
+                              <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+                            </c:when>
+                            <c:when test="${en.paymentStatus == 'paid'}">
+                              <span class="badge bg-success">Đã thanh toán</span>
+                            </c:when>
+                            <c:when test="${en.paymentStatus == 'refunded'}">
+                              <span class="badge bg-secondary">Đã hoàn tiền</span>
+                            </c:when>
+                            <c:when test="${en.paymentStatus == 'cancelled'}">
+                              <span class="badge bg-danger">Đã hủy</span>
+                            </c:when>
+                          </c:choose>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </tbody>
+                </table>
+              </div>
+            </c:otherwise>
+          </c:choose>
 
-    <div class="sidebar-section-label">Tổng quan</div>
-    <a href="<%= s_contextPath %>/student/dashboard"
-       class="sidebar-link <%= s_uri.contains("/student/dashboard") ? "active" : "" %>">
-      <i class="bi bi-grid-1x2"></i> Dashboard
-    </a>
+        </div>
+      </div><!-- End Enrollment Card -->
+    </div>
 
-    <div class="sidebar-section-label">Học tập</div>
-    <a href="<%= s_contextPath %>/student/courses"
-       class="sidebar-link <%= s_uri.contains("/student/courses") ? "active" : "" %>">
-      <i class="bi bi-book"></i> Khóa học
-    </a>
-    <a href="<%= s_contextPath %>/student/my-classes"
-       class="sidebar-link <%= s_uri.contains("/student/my-classes") ? "active" : "" %>">
-      <i class="bi bi-journal-bookmark"></i> Lớp đã đăng ký
-    </a>
+  </div>
+</section>
 
-    <div class="sidebar-section-label">Học vụ</div>
-    <a href="<%= s_contextPath %>/student/schedule"
-       class="sidebar-link <%= s_uri.contains("/student/schedule") ? "active" : "" %>">
-      <i class="bi bi-calendar-week"></i> Thời khóa biểu
-    </a>
-    <a href="<%= s_contextPath %>/student/grades"
-       class="sidebar-link <%= s_uri.contains("/student/grades") ? "active" : "" %>">
-      <i class="bi bi-award"></i> Điểm số
-    </a>
-    <a href="<%= s_contextPath %>/student/ai-consult"
-       class="sidebar-link <%= s_uri.contains("/student/ai-consult") ? "active" : "" %>">
-      <i class="bi bi-robot"></i> Tư vấn AI
-    </a>
-
-  <% } %>
-
-  <div class="sidebar-section-label">Tài khoản</div>
-  <a href="<%= s_contextPath %>/profile"
-     class="sidebar-link <%= s_uri.contains("/profile") ? "active" : "" %>">
-    <i class="bi bi-person-circle"></i> Hồ sơ cá nhân
-  </a>
-
-</nav>
-
-<div class="page-content">
+<%@ include file="/WEB-INF/views/common/footer.jsp" %>

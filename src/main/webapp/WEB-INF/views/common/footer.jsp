@@ -1,31 +1,30 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<footer style="background:#0d6efd; border-top:1px solid #e3e6f0;
-               text-align:center; padding:15px; margin-top:20px;
-               font-size:14px; color:#fff; width:100%;">
-  © 2025 Language Center · Team 5 · Java MVC
-</footer>
+</main><!-- End #main -->
 
-</div><%-- đóng .page-content --%>
-</div><%-- đóng .main-wrapper --%>
+<!-- ======= Footer ======= -->
+<footer id="footer" class="footer">
+  <div class="copyright">
+    &copy; 2026 <strong>Language Center</strong> · Team 5 · Java MVC
+  </div>
+</footer><!-- End Footer -->
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+  <i class="bi bi-arrow-up-short"></i>
+</a>
 
-<script>
-document.addEventListener('click', function(e) {
-  const sidebar = document.getElementById('sidebar');
-  const toggleBtn = document.getElementById('sidebarToggle');
-  if (sidebar && toggleBtn && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-    sidebar.classList.remove('show');
-  }
-});
-</script>
+<!-- Vendor JS Files -->
+<script src="<%= request.getContextPath() %>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-<%-- FLOATING CHATBOT --%>
-<% 
+<!-- NiceAdmin Main JS (xử lý sidebar toggle, back-to-top, v.v.) -->
+<script src="<%= request.getContextPath() %>/assets/js/main.js"></script>
+
+<%-- ══════════════════════════════════════════════════════════════ --%>
+<%-- FLOATING CHATBOT — chỉ hiện với Student                       --%>
+<%-- ══════════════════════════════════════════════════════════════ --%>
+<%
 String userRole = (String) session.getAttribute("role");
-if (userRole != null && userRole.equalsIgnoreCase("student")) { 
+if (userRole != null && userRole.equalsIgnoreCase("student")) {
 %>
 
 <style>
@@ -38,7 +37,7 @@ if (userRole != null && userRole.equalsIgnoreCase("student")) {
   display: flex; align-items: center; justify-content: center;
   font-size: 24px; transition: transform .2s, background .2s;
 }
-#floatBubble:hover { background:#0b5ed7; transform: scale(1.1); }
+#floatBubble:hover { background: #0b5ed7; transform: scale(1.1); }
 #floatBubble .badge-dot {
   position: absolute; top: 4px; right: 4px;
   width: 14px; height: 14px; background: #dc3545;
@@ -145,19 +144,12 @@ if (userRole != null && userRole.equalsIgnoreCase("student")) {
 
   window.sendFloatMsg = async function() {
     var q = inp.value.trim();
-    
-    // Validation đầu vào
-    if (!q || q.length === 0) {
-      inp.focus();
-      return;
-    }
+    if (!q || q.length === 0) { inp.focus(); return; }
 
-    // Hiện tin user ngay
     addMsg(q, true);
     inp.value = '';
     btn.disabled = true;
 
-    // Typing indicator
     var typing = document.createElement('div');
     typing.className = 'fc-msg bot';
     typing.id = 'fc-typing';
@@ -166,7 +158,6 @@ if (userRole != null && userRole.equalsIgnoreCase("student")) {
     msgs.scrollTop = msgs.scrollHeight;
 
     try {
-      // ✅ FIX: dùng URLSearchParams thay vì FormData
       var params = new URLSearchParams();
       params.append('question', q);
 
@@ -177,14 +168,11 @@ if (userRole != null && userRole.equalsIgnoreCase("student")) {
       });
 
       if (!res.ok) throw new Error('HTTP ' + res.status);
-
       var data = await res.json();
-      
-      // Xóa typing
+
       var t = document.getElementById('fc-typing');
       if (t) t.remove();
 
-      // Hiện câu trả lời
       if (data.answer && data.answer.trim()) {
         addMsg(data.answer, false);
       } else if (data.error) {
@@ -192,7 +180,6 @@ if (userRole != null && userRole.equalsIgnoreCase("student")) {
       } else {
         addMsg('⚠ Không nhận được câu trả lời từ AI.', false);
       }
-
     } catch (err) {
       var t = document.getElementById('fc-typing');
       if (t) t.remove();
@@ -204,14 +191,12 @@ if (userRole != null && userRole.equalsIgnoreCase("student")) {
     }
   };
 
-  // Enter để gửi, Shift+Enter xuống dòng
   inp.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendFloatMsg();
     }
   });
-
 })();
 </script>
 

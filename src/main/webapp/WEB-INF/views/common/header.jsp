@@ -1,89 +1,98 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <%@ page import="com.langcenter.model.User" %>
 <%
-    // KHAI BÁO BIẾN 1 LẦN DUY NHẤT TẠI ĐÂY
     User loggedUser = (User) session.getAttribute("loggedUser");
     String contextPath = request.getContextPath();
 %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Language Center</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Favicons -->
+  <link href="<%= contextPath %>/assets/img/favicon.png" rel="icon">
 
-  <style>
-    /* ── Layout skeleton ────────────────────────────────────── */
-    body { display: flex; flex-direction: column; min-height: 100vh; background: #f4f6fb; }
-    .main-wrapper { display: flex; flex: 1; }
-    .page-content { flex: 1; padding: 24px; overflow-y: auto; }
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
-    /* ── Topbar ─────────────────────────────────────────────── */
-    .topbar {
-      height: 56px; background: #fff; border-bottom: 1px solid #e3e6f0;
-      display: flex; align-items: center; padding: 0 20px;
-      position: sticky; top: 0; z-index: 1030; gap: 12px;
-    }
-    .topbar-brand {
-      font-weight: 700; font-size: 17px; color: #1a73e8;
-      text-decoration: none; display: flex; align-items: center; gap: 8px; white-space: nowrap;
-    }
-    .topbar-brand span { font-size: 22px; }
-    .topbar-spacer { flex: 1; }
+  <!-- Vendor CSS Files -->
+  <link href="<%= contextPath %>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<%= contextPath %>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<%= contextPath %>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
 
-    /* Role badge */
-    .role-badge {
-      font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
-      text-transform: uppercase; letter-spacing: .5px;
-    }
-    .role-admin   { background: #fde8e8; color: #c0392b; }
-    .role-teacher { background: #e8f5e9; color: #1b5e20; }
-    .role-student { background: #e3f2fd; color: #0d47a1; }
+  <!-- NiceAdmin Main CSS -->
+  <link href="<%= contextPath %>/assets/css/style.css" rel="stylesheet">
 
-    /* Avatar dropdown */
-    .avatar-btn {
-      width: 36px; height: 36px; border-radius: 50%; background: #1a73e8; color: #fff;
-      font-weight: 600; font-size: 14px; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Sidebar toggle btn (mobile) */
-    #sidebarToggle { display: none; }
-    @media (max-width: 768px) { #sidebarToggle { display: flex; } }
-  </style>
 </head>
 <body>
 
-<nav class="topbar">
-  <button id="sidebarToggle" class="btn btn-sm btn-light me-2" onclick="document.getElementById('sidebar').classList.toggle('show')">
-    <i class="bi bi-list fs-5"></i>
-  </button>
-  <a class="topbar-brand" href="<%= contextPath %>/dashboard"><span>🎓</span> Language Center</a>
-  <div class="topbar-spacer"></div>
+<!-- ======= Header ======= -->
+<header id="header" class="header fixed-top d-flex align-items-center">
 
-  <% if (loggedUser != null) { %>
-  <span class="role-badge role-<%= loggedUser.getRole() %>"><%= loggedUser.getRole() %></span>
-  <div class="dropdown">
-    <button class="avatar-btn dropdown-toggle" data-bs-toggle="dropdown" title="<%= loggedUser.getFullName() %>" style="list-style:none">
-      <%= loggedUser.getFullName().substring(0, 1).toUpperCase() %>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-      <li>
-        <div class="px-3 py-2">
-          <div class="fw-semibold" style="font-size:14px"><%= loggedUser.getFullName() %></div>
-          <div class="text-muted" style="font-size:12px"><%= loggedUser.getEmail() %></div>
-        </div>
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="<%= contextPath %>/admin/dashboard" class="logo d-flex align-items-center">
+      <span class="d-none d-lg-block">🎓 Language Center</span>
+    </a>
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+  </div><!-- End Logo -->
+
+  <nav class="header-nav ms-auto">
+    <ul class="d-flex align-items-center">
+
+      <% if (loggedUser != null) { %>
+
+      <!-- Role badge -->
+      <li class="nav-item d-none d-sm-block pe-3">
+        <%
+          String role = loggedUser.getRole();
+          String badgeColor = "primary";
+          if ("admin".equals(role))        badgeColor = "danger";
+          else if ("teacher".equals(role)) badgeColor = "success";
+        %>
+        <span class="badge bg-<%= badgeColor %> text-uppercase"><%= role %></span>
       </li>
-      <li><hr class="dropdown-divider my-1"></li>
-      <li><a class="dropdown-item" href="<%= contextPath %>/profile"><i class="bi bi-person me-2"></i>Hồ sơ cá nhân</a></li>
-      <li><hr class="dropdown-divider my-1"></li>
-      <li><a class="dropdown-item text-danger" href="<%= contextPath %>/logout"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
-    </ul>
-  </div>
-  <% } %>
-</nav>
 
-<div class="main-wrapper">
+      <!-- Profile Nav -->
+      <li class="nav-item dropdown pe-3">
+        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+          <!-- Avatar chữ cái đầu -->
+          <span class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold"
+                style="width:36px;height:36px;background:#0d6efd;font-size:14px;flex-shrink:0;">
+            <%= loggedUser.getFullName().substring(0, 1).toUpperCase() %>
+          </span>
+          <span class="d-none d-md-block dropdown-toggle ps-2">
+            <%= loggedUser.getFullName() %>
+          </span>
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li class="dropdown-header">
+            <h6><%= loggedUser.getFullName() %></h6>
+            <span><%= loggedUser.getEmail() %></span>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="<%= contextPath %>/profile">
+              <i class="bi bi-person"></i>
+              <span>Hồ sơ cá nhân</span>
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a class="dropdown-item d-flex align-items-center text-danger" href="<%= contextPath %>/logout">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Đăng xuất</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Profile Nav -->
+
+      <% } %>
+
+    </ul>
+  </nav><!-- End Icons Navigation -->
+
+</header><!-- End Header -->

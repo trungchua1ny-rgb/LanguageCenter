@@ -269,4 +269,30 @@ public class CourseDAO {
         }
         return list;
     }
+    public List<String[]> getEnrolledClassesByStudent(int studentId) {
+        List<String[]> result = new ArrayList<>();
+        String sql =
+            "SELECT DISTINCT cl.id, cl.class_name, co.name AS course_name " +
+            "FROM enrollments en " +
+            "JOIN classes cl  ON en.class_id  = cl.id " +
+            "JOIN courses co  ON cl.course_id = co.id " +
+            "WHERE en.student_id = ? AND en.payment_status = 'paid' " +
+            "ORDER BY cl.class_name";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.add(new String[]{
+                        rs.getString("id"),
+                        rs.getString("class_name"),
+                        rs.getString("course_name")
+                    });
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[GradeDAO.getEnrolledClassesByStudent] " + e.getMessage());
+        }
+        return result;
+    }
 }

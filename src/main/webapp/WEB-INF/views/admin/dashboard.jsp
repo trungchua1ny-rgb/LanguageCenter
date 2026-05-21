@@ -1,78 +1,142 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
-<%-- ══ HEADER (Khai báo biến nằm ở trong này) ══ --%>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
-
-<%-- ══ SIDEBAR (Menu trái) ══ --%>
 <%@ include file="/WEB-INF/views/common/sidebar.jsp" %>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <h5 class="fw-bold mb-1">Xin chào, <%= loggedUser != null ? loggedUser.getFullName() : "Admin" %> 👋</h5>
-    <p class="text-muted mb-0" style="font-size:14px">Chào mừng bạn quay trở lại hệ thống.</p>
-  </div>
-</div>
+<div class="pagetitle">
+  <h1>Dashboard</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="<%= contextPath %>/admin/dashboard">Home</a></li>
+      <li class="breadcrumb-item active">Dashboard</li>
+    </ol>
+  </nav>
+</div><!-- End Page Title -->
 
-<div class="row g-3 mb-4">
-  
-  <%-- THẺ KHÓA HỌC (Đã được bọc link) --%>
-  <div class="col-6 col-md-3">
-    <a href="${pageContext.request.contextPath}/admin/courses" class="card border-0 shadow-sm h-100 text-decoration-none text-dark" style="transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div style="width:44px;height:44px;border-radius:12px;background:#e8f0fe; display:flex;align-items:center;justify-content:center;font-size:22px;">📚</div>
-        <div>
-          <div class="fw-bold fs-5">4</div>
-          <div class="text-muted" style="font-size:12px">Khóa học</div>
+<section class="section dashboard">
+
+  <%-- ══ LỜI CHÀO ══ --%>
+  <div class="card mb-3">
+    <div class="card-body py-3">
+      <h5 class="card-title mb-0">
+        Xin chào, <%= loggedUser != null ? loggedUser.getFullName() : "Admin" %> 👋
+      </h5>
+      <p class="text-muted mb-0 mt-1" style="font-size:14px">Chào mừng bạn quay trở lại hệ thống.</p>
+    </div>
+  </div>
+
+  <%-- ══ 4 THẺ THỐNG KÊ ══ --%>
+  <div class="row">
+
+    <div class="col-xxl-3 col-md-6">
+      <a href="<%= contextPath %>/admin/courses" class="text-decoration-none">
+        <div class="card info-card sales-card">
+          <div class="card-body">
+            <h5 class="card-title">Khóa học <span>| Tổng</span></h5>
+            <div class="d-flex align-items-center">
+              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                <i class="bi bi-book"></i>
+              </div>
+              <div class="ps-3">
+                <h6>${totalCourses != null ? totalCourses : 4}</h6>
+                <span class="text-muted small pt-2 ps-1">khóa học</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </a>
-  </div>
+      </a>
+    </div><!-- End Khoa hoc Card -->
 
-  <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div style="width:44px;height:44px;border-radius:12px;background:#e8f5e9; display:flex;align-items:center;justify-content:center;font-size:22px;">🎯</div>
-        <div>
-          <div class="fw-bold fs-5">2</div>
-          <div class="text-muted" style="font-size:12px">Lớp đang học</div>
+    <div class="col-xxl-3 col-md-6">
+      <a href="<%= contextPath %>/admin/classes" class="text-decoration-none">
+        <div class="card info-card revenue-card">
+          <div class="card-body">
+            <h5 class="card-title">Lớp đang học <span>| Ongoing</span></h5>
+            <div class="d-flex align-items-center">
+              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                <i class="bi bi-door-open"></i>
+              </div>
+              <div class="ps-3">
+                <h6>${totalOngoingClasses != null ? totalOngoingClasses : 2}</h6>
+                <span class="text-muted small pt-2 ps-1">lớp</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div><!-- End Lop dang hoc Card -->
+
+    <div class="col-xxl-3 col-md-6">
+      <a href="<%= contextPath %>/admin/enrollments?status=pending" class="text-decoration-none">
+        <div class="card info-card customers-card">
+          <div class="card-body">
+            <h5 class="card-title">Chờ duyệt <span>| Pending</span></h5>
+            <div class="d-flex align-items-center">
+              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                <i class="bi bi-hourglass-split"></i>
+              </div>
+              <div class="ps-3">
+                <h6>${totalPending != null ? totalPending : 3}</h6>
+                <span class="text-success small pt-1 fw-bold">đơn đăng ký</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div><!-- End Don cho duyet Card -->
+
+    <div class="col-xxl-3 col-md-6">
+      <a href="<%= contextPath %>/admin/students" class="text-decoration-none">
+        <div class="card info-card" style="border-left: 4px solid #f6c23e;">
+          <div class="card-body">
+            <h5 class="card-title">Học viên <span>| Tổng</span></h5>
+            <div class="d-flex align-items-center">
+              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                   style="background: #fff3cd; color:#f6c23e;">
+                <i class="bi bi-people"></i>
+              </div>
+              <div class="ps-3">
+                <h6>${totalStudents != null ? totalStudents : 10}</h6>
+                <span class="text-muted small pt-2 ps-1">học viên</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div><!-- End Hoc vien Card -->
+
+  </div><!-- End Stats Row -->
+
+  <%-- ══ BẢNG ĐĂNG KÝ MỚI NHẤT ══ --%>
+  <div class="row">
+    <div class="col-12">
+      <div class="card recent-sales overflow-auto">
+        <div class="card-body">
+          <h5 class="card-title">Đăng ký mới nhất <span>| 5 gần nhất</span></h5>
+          <table class="table table-hover align-middle" style="font-size:14px">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Học viên</th>
+                <th>Lớp học</th>
+                <th>Ngày đăng ký</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%-- Nếu đã có data từ Servlet thì dùng JSTL, tạm thời để placeholder --%>
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                  <i class="bi bi-inbox fs-4 d-block mb-1"></i>
+                  Dữ liệu sẽ được hiển thị sau khi kết nối DB.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div style="width:44px;height:44px;border-radius:12px;background:#fff8e1; display:flex;align-items:center;justify-content:center;font-size:22px;">📝</div>
-        <div>
-          <div class="fw-bold fs-5">3</div>
-          <div class="text-muted" style="font-size:12px">Bài kiểm tra</div>
-        </div>
-      </div>
-    </div>
-  </div>
+</section>
 
-  <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div style="width:44px;height:44px;border-radius:12px;background:#fce4ec; display:flex;align-items:center;justify-content:center;font-size:22px;">⭐</div>
-        <div>
-          <div class="fw-bold fs-5">7.2</div>
-          <div class="text-muted" style="font-size:12px">Điểm TB</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="card border-0 shadow-sm">
-  <div class="card-header bg-white border-bottom py-3">
-    <span class="fw-semibold">📅 Thông báo nội bộ</span>
-  </div>
-  <div class="card-body text-muted text-center py-5" style="font-size:14px">
-    Chưa có thông báo nào hôm nay. Dữ liệu sẽ được kết nối sau.
-  </div>
-</div>
-
-<%-- ══ FOOTER ══ --%>
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>

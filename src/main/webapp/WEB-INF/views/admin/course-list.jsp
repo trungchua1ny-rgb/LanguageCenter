@@ -5,120 +5,137 @@
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/common/sidebar.jsp" %>
 
-<%-- ══ HEADER TRANG ══ --%>
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <h5 class="fw-bold mb-1">Quản lý khóa học</h5>
-    <p class="text-muted mb-0" style="font-size:14px">
-      Tổng cộng <strong>${courses.size()}</strong> khóa học
-    </p>
-  </div>
-  <a href="${pageContext.request.contextPath}/admin/courses?action=add"
-     class="btn btn-primary btn-sm">
-    <i class="bi bi-plus-circle me-1"></i>Thêm khóa học
-  </a>
-</div>
+<div class="pagetitle">
+  <h1>Quản lý Khóa học</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/dashboard">Home</a></li>
+      <li class="breadcrumb-item active">Khóa học</li>
+    </ol>
+  </nav>
+</div><!-- End Page Title -->
 
-<%-- ══ THÔNG BÁO ══ --%>
-<c:if test="${not empty successMsg}">
-  <div class="alert alert-success alert-dismissible fade show py-2">
-    <i class="bi bi-check-circle me-1"></i>${successMsg}
-    <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-  </div>
-</c:if>
-<c:if test="${not empty errorMsg}">
-  <div class="alert alert-danger alert-dismissible fade show py-2">
-    <i class="bi bi-exclamation-circle me-1"></i>${errorMsg}
-    <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-  </div>
-</c:if>
+<section class="section">
+  <div class="row">
+    <div class="col-lg-12">
 
-<%-- ══ BẢNG DANH SÁCH ══ --%>
-<div class="card border-0 shadow-sm">
-  <div class="card-body p-0">
-    <c:choose>
-      <c:when test="${empty courses}">
-        <div class="text-center py-5 text-muted">
-          <i class="bi bi-inbox fs-1"></i>
-          <p class="mt-2">Chưa có khóa học nào.</p>
+      <div class="card">
+        <div class="card-body">
+
+          <%-- ══ TIÊU ĐỀ + NÚT THÊM ══ --%>
+          <div class="d-flex justify-content-between align-items-center pt-3 mb-3">
+            <div>
+              <h5 class="card-title mb-0">Danh sách khóa học</h5>
+              <p class="text-muted mb-0" style="font-size:13px">
+                Tổng cộng <strong>${courses.size()}</strong> khóa học
+              </p>
+            </div>
+            <a href="${pageContext.request.contextPath}/admin/courses?action=add"
+               class="btn btn-primary btn-sm">
+              <i class="bi bi-plus-circle me-1"></i>Thêm khóa học
+            </a>
+          </div>
+
+          <%-- ══ THÔNG BÁO ══ --%>
+          <c:if test="${not empty successMsg}">
+            <div class="alert alert-success alert-dismissible fade show py-2">
+              <i class="bi bi-check-circle me-1"></i>${successMsg}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          </c:if>
+          <c:if test="${not empty errorMsg}">
+            <div class="alert alert-danger alert-dismissible fade show py-2">
+              <i class="bi bi-exclamation-circle me-1"></i>${errorMsg}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          </c:if>
+
+          <%-- ══ BẢNG ══ --%>
+          <c:choose>
+            <c:when test="${empty courses}">
+              <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                Chưa có khóa học nào.
+              </div>
+            </c:when>
+            <c:otherwise>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-size:14px">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width:40px">#</th>
+                      <th>Tên khóa học</th>
+                      <th>Cấp độ</th>
+                      <th>Giáo viên</th>
+                      <th>Số tuần</th>
+                      <th>Học phí</th>
+                      <th>Sĩ số</th>
+                      <th>Trạng thái</th>
+                      <th style="width:120px">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <c:forEach var="c" items="${courses}" varStatus="s">
+                      <tr>
+                        <td class="text-muted">${s.count}</td>
+                        <td>
+                          <div class="fw-semibold">${c.name}</div>
+                          <div class="text-muted" style="font-size:12px;max-width:220px;
+                               white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                            ${c.description}
+                          </div>
+                        </td>
+                        <td>
+                          <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary"
+                                style="font-size:11px">${c.levelName}</span>
+                        </td>
+                        <td>
+                          <c:choose>
+                            <c:when test="${not empty c.teacherName}">${c.teacherName}</c:when>
+                            <c:otherwise><span class="text-muted">Chưa phân công</span></c:otherwise>
+                          </c:choose>
+                        </td>
+                        <td>${c.durationWeeks} tuần</td>
+                        <td class="fw-semibold text-primary">
+                          <fmt:formatNumber value="${c.tuitionFee}" type="number"
+                                            groupingUsed="true" maxFractionDigits="0"/>đ
+                        </td>
+                        <td>${c.maxStudents}</td>
+                        <td>
+                          <c:choose>
+                            <c:when test="${c.active}">
+                              <span class="badge bg-success">Đang mở</span>
+                            </c:when>
+                            <c:otherwise>
+                              <span class="badge bg-secondary">Đã ẩn</span>
+                            </c:otherwise>
+                          </c:choose>
+                        </td>
+                        <td>
+                          <a href="${pageContext.request.contextPath}/admin/courses?action=edit&id=${c.id}"
+                             class="btn btn-sm btn-outline-primary py-0 px-2 me-1" title="Sửa">
+                            <i class="bi bi-pencil"></i>
+                          </a>
+                          <button class="btn btn-sm btn-outline-danger py-0 px-2"
+                                  title="Xóa"
+                                  onclick="confirmDelete(${c.id}, '${c.name}')">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </tbody>
+                </table>
+              </div>
+            </c:otherwise>
+          </c:choose>
+
         </div>
-      </c:when>
-      <c:otherwise>
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0" style="font-size:14px">
-            <thead class="table-light">
-              <tr>
-                <th style="width:40px">#</th>
-                <th>Tên khóa học</th>
-                <th>Cấp độ</th>
-                <th>Giáo viên</th>
-                <th>Số tuần</th>
-                <th>Học phí</th>
-                <th>Sĩ số</th>
-                <th>Trạng thái</th>
-                <th style="width:120px">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              <c:forEach var="c" items="${courses}" varStatus="s">
-                <tr>
-                  <td class="text-muted">${s.count}</td>
-                  <td>
-                    <div class="fw-semibold">${c.name}</div>
-                    <div class="text-muted" style="font-size:12px;
-                         max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                      ${c.description}
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge rounded-pill"
-                          style="background:#e8f0fe;color:#1a73e8;font-size:11px">
-                      ${c.levelName}
-                    </span>
-                  </td>
-                  <td>
-                    <c:choose>
-                      <c:when test="${not empty c.teacherName}">${c.teacherName}</c:when>
-                      <c:otherwise><span class="text-muted">Chưa phân công</span></c:otherwise>
-                    </c:choose>
-                  </td>
-                  <td>${c.durationWeeks} tuần</td>
-                  <td class="fw-semibold text-primary">
-                    <fmt:formatNumber value="${c.tuitionFee}" type="number"
-                                      groupingUsed="true" maxFractionDigits="0"/>đ
-                  </td>
-                  <td>${c.maxStudents}</td>
-                  <td>
-                    <c:choose>
-                      <c:when test="${c.active}">
-                        <span class="badge bg-success">Đang mở</span>
-                      </c:when>
-                      <c:otherwise>
-                        <span class="badge bg-secondary">Đã ẩn</span>
-                      </c:otherwise>
-                    </c:choose>
-                  </td>
-                  <td>
-                    <%-- Nút Sửa --%>
-                    <a href="${pageContext.request.contextPath}/admin/courses?action=edit&id=${c.id}"
-                       class="btn btn-sm btn-outline-primary py-0 px-2 me-1">
-                      <i class="bi bi-pencil"></i>
-                    </a>
-                    <%-- Nút Xóa --%>
-                    <button class="btn btn-sm btn-outline-danger py-0 px-2"
-                            onclick="confirmDelete(${c.id}, '${c.name}')">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              </c:forEach>
-            </tbody>
-          </table>
-        </div>
-      </c:otherwise>
-    </c:choose>
+      </div><!-- End Card -->
+
+    </div>
   </div>
-</div>
+</section>
 
 <%-- ══ MODAL XÁC NHẬN XÓA ══ --%>
 <div class="modal fade" id="deleteModal" tabindex="-1">
