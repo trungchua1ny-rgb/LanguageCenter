@@ -100,13 +100,54 @@ public class EnrollmentDAO {
                     e.setStartDate(rs.getString("start_date"));
                     e.setEndDate(rs.getString("end_date")); 
                     e.setScheduleInfo(rs.getString("schedule_info"));
-                    e.setEnrolledDate(rs.getDate("enrolled_date").toLocalDate());
+                    
+                    Date enrolledDate = rs.getDate("enrolled_date");
+                    if (enrolledDate != null) {
+                        e.setEnrolledDate(enrolledDate.toLocalDate());
+                    }
                     
                     list.add(e);
                 }
             }
         } catch (Exception ex) {
             System.err.println("[EnrollmentDAO] getMyEnrollments lỗi: " + ex.getMessage());
+        }
+        return list;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // 4. LẤY DANH SÁCH ĐĂNG KÝ MỚI NHẤT (Dùng cho Dashboard Admin)
+    // ═══════════════════════════════════════════════════════════════
+    public List<Enrollment> getRecent(int limit) {
+        List<Enrollment> list = new ArrayList<>();
+        String sql =
+            "SELECT en.id, u.full_name AS student_name, " +
+            "       cl.class_name, en.enrolled_date, en.payment_status " +
+            "FROM enrollments en " +
+            "JOIN users u   ON en.student_id = u.id " +
+            "JOIN classes cl ON en.class_id  = cl.id " +
+            "ORDER BY en.enrolled_date DESC " +
+            "LIMIT ?";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Enrollment en = new Enrollment();
+                    en.setStudentName(rs.getString("student_name"));
+                    en.setClassName(rs.getString("class_name"));
+                    en.setPaymentStatus(rs.getString("payment_status"));
+                    
+                    Date enrolledDate = rs.getDate("enrolled_date");
+                    if (enrolledDate != null) {
+                        en.setEnrolledDate(enrolledDate.toLocalDate());
+                    }
+                    
+                    list.add(en);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[EnrollmentDAO.getRecent] " + e.getMessage());
         }
         return list;
     }

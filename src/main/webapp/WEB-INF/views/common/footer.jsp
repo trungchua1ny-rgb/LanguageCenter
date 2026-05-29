@@ -1,206 +1,213 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
-</main><!-- End #main -->
-
-<!-- ======= Footer ======= -->
-<footer id="footer" class="footer">
-  <div class="copyright">
-    &copy; 2026 <strong>Language Center</strong> · Team 5 · Java MVC
-  </div>
-</footer><!-- End Footer -->
-
-<a href="#" class="back-to-top d-flex align-items-center justify-content-center">
-  <i class="bi bi-arrow-up-short"></i>
-</a>
-
-<!-- Vendor JS Files -->
-<script src="<%= request.getContextPath() %>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- NiceAdmin Main JS (xử lý sidebar toggle, back-to-top, v.v.) -->
-<script src="<%= request.getContextPath() %>/assets/js/main.js"></script>
-
-<%-- ══════════════════════════════════════════════════════════════ --%>
-<%-- FLOATING CHATBOT — chỉ hiện với Student                       --%>
-<%-- ══════════════════════════════════════════════════════════════ --%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <%
-String userRole = (String) session.getAttribute("role");
-if (userRole != null && userRole.equalsIgnoreCase("student")) {
+    String f_ctx  = request.getContextPath();
+    String f_role = (String) session.getAttribute("role");
 %>
 
+</main><!-- /#lc-main -->
+</div><!-- /#lc-layout -->
+
+<!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════════ -->
+<footer style="margin-left:var(--sidebar-w);padding:16px 20px;
+               border-top:1px solid var(--border);background:var(--bg-white);
+               font-size:12px;color:var(--text-muted);text-align:center;">
+  © 2026 Language Center · Đồ án môn học · Java MVC
+</footer>
+
+<!-- ═══════════════════════════════════ CHATBOT (Student only) ═══════════════════════════════════ -->
+<% if ("student".equals(f_role)) { %>
 <style>
-#floatBubble {
-  position: fixed; bottom: 28px; right: 28px;
-  width: 56px; height: 56px; border-radius: 50%;
-  background: #0d6efd; color: #fff; border: none;
-  box-shadow: 0 4px 16px rgba(13,110,253,.45);
-  cursor: pointer; z-index: 9999;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; transition: transform .2s, background .2s;
-}
-#floatBubble:hover { background: #0b5ed7; transform: scale(1.1); }
-#floatBubble .badge-dot {
-  position: absolute; top: 4px; right: 4px;
-  width: 14px; height: 14px; background: #dc3545;
-  border-radius: 50%; border: 2px solid #fff;
-}
-#floatChat {
-  position: fixed; bottom: 96px; right: 28px;
-  width: 370px; height: 500px; background: #fff;
-  border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,.18);
-  z-index: 9998; display: none; flex-direction: column; overflow: hidden;
-}
-#floatChat.open { display: flex; }
-#floatChat .fc-header {
-  background: #0d6efd; color: #fff; padding: 12px 16px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0;
-}
-#floatChat .fc-header .title {
-  font-size: 14px; font-weight: 600;
-  display: flex; align-items: center; gap: 8px;
-}
-#floatChat .fc-header .close-btn {
-  background: none; border: none; color: #fff;
-  font-size: 18px; cursor: pointer; line-height: 1; padding: 0;
-}
-#floatMessages {
-  flex: 1; overflow-y: auto; padding: 12px; background: #f8f9fa;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.fc-msg {
-  max-width: 82%; padding: 8px 12px; border-radius: 12px;
-  font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
-}
-.fc-msg.user {
-  align-self: flex-end; background: #0d6efd; color: #fff;
-  border-bottom-right-radius: 4px;
-}
-.fc-msg.bot {
-  align-self: flex-start; background: #fff; border: 1px solid #dee2e6;
-  border-bottom-left-radius: 4px;
-}
-#floatChat .fc-input {
-  display: flex; border-top: 1px solid #dee2e6; flex-shrink: 0;
-}
-#floatChat .fc-input textarea {
-  flex: 1; border: none; resize: none; padding: 10px 12px;
-  font-size: 13px; outline: none; font-family: inherit;
-}
-#floatChat .fc-input .send-btn {
-  width: 48px; background: #0d6efd; color: #fff; border: none;
-  cursor: pointer; font-size: 16px; transition: background .2s;
-}
-#floatChat .fc-input .send-btn:hover { background: #0b5ed7; }
-#floatChat .fc-input .send-btn:disabled { background: #6c757d; }
+  #lcChatBtn {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--primary); color: #fff; border: none;
+    box-shadow: 0 4px 16px rgba(30,136,229,.45);
+    cursor: pointer; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; transition: transform .2s, background .2s;
+  }
+  #lcChatBtn:hover { background: var(--primary-dark); transform: scale(1.08); }
+  #lcChatBtn .dot {
+    position: absolute; top: 5px; right: 5px;
+    width: 12px; height: 12px; background: #f44336;
+    border-radius: 50%; border: 2px solid #fff;
+  }
+  #lcChatBox {
+    position: fixed; bottom: 88px; right: 24px;
+    width: 360px; max-height: 500px;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.15);
+    z-index: 9998; display: none; flex-direction: column;
+    overflow: hidden; border: 1px solid var(--border);
+    font-family: var(--font);
+  }
+  #lcChatBox.open { display: flex; }
+  #lcChatBox .cb-head {
+    background: var(--primary); color: #fff;
+    padding: 12px 16px;
+    display: flex; align-items: center;
+    justify-content: space-between; flex-shrink: 0;
+  }
+  #lcChatBox .cb-head .title {
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  #lcChatBox .cb-head .close {
+    background: none; border: none;
+    color: rgba(255,255,255,.8); font-size: 18px;
+    cursor: pointer; line-height: 1;
+  }
+  #lcChatMsgs {
+    flex: 1; overflow-y: auto; padding: 12px;
+    background: #f8f9fa; display: flex;
+    flex-direction: column; gap: 8px;
+  }
+  .cb-msg {
+    max-width: 82%; padding: 8px 12px;
+    border-radius: 12px; font-size: 13px;
+    line-height: 1.5; white-space: pre-wrap;
+  }
+  .cb-msg.user {
+    align-self: flex-end;
+    background: var(--primary); color: #fff;
+    border-bottom-right-radius: 3px;
+  }
+  .cb-msg.bot {
+    align-self: flex-start;
+    background: #fff; border: 1px solid var(--border);
+    border-bottom-left-radius: 3px;
+  }
+  #lcChatBox .cb-input {
+    display: flex; border-top: 1px solid var(--border); flex-shrink: 0;
+  }
+  #lcChatBox .cb-input textarea {
+    flex: 1; border: none; resize: none; padding: 10px 12px;
+    font-size: 13px; outline: none; font-family: var(--font);
+  }
+  #lcChatBox .cb-input .send {
+    width: 46px; background: var(--primary); color: #fff;
+    border: none; cursor: pointer; font-size: 16px;
+    transition: background .2s;
+  }
+  #lcChatBox .cb-input .send:hover { background: var(--primary-dark); }
+  #lcChatBox .cb-input .send:disabled { background: #9ca3af; }
 </style>
 
-<button id="floatBubble" onclick="toggleFloatChat()" title="Tư vấn AI">
+<button id="lcChatBtn" onclick="lcToggleChat()" title="Tư vấn AI">
   <i class="bi bi-robot"></i>
-  <span class="badge-dot"></span>
+  <span class="dot"></span>
 </button>
 
-<div id="floatChat">
-  <div class="fc-header">
+<div id="lcChatBox">
+  <div class="cb-head">
     <div class="title"><i class="bi bi-robot"></i> Tư vấn AI lộ trình học</div>
-    <button class="close-btn" onclick="toggleFloatChat()">✕</button>
+    <button class="close" onclick="lcToggleChat()">✕</button>
   </div>
-  <div id="floatMessages">
-    <div class="fc-msg bot">Xin chào! 👋 Tôi có thể tư vấn lộ trình học.<br>Hãy đặt câu hỏi nhé!</div>
+  <div id="lcChatMsgs">
+    <div class="cb-msg bot">Xin chào! 👋 Tôi có thể tư vấn lộ trình học cho bạn. Hãy đặt câu hỏi nhé!</div>
   </div>
-  <div class="fc-input">
-    <textarea id="floatInput" rows="2" placeholder="Nhập câu hỏi... (Enter gửi)"
-              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFloatMsg();}"></textarea>
-    <button class="send-btn" id="floatSendBtn" onclick="sendFloatMsg()">
+  <div class="cb-input">
+    <textarea id="lcChatInput" rows="2"
+              placeholder="Nhập câu hỏi... (Enter gửi)"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();lcSend();}"></textarea>
+    <button class="send" id="lcSendBtn" onclick="lcSend()">
       <i class="bi bi-send-fill"></i>
     </button>
   </div>
 </div>
 
 <script>
-(function() {
-  var chat = document.getElementById('floatChat');
-  var msgs = document.getElementById('floatMessages');
-  var inp  = document.getElementById('floatInput');
-  var btn  = document.getElementById('floatSendBtn');
-  var bdg  = document.querySelector('#floatBubble .badge-dot');
-  var ctx  = '<%= request.getContextPath() %>';
+(function(){
+  const box  = document.getElementById('lcChatBox');
+  const msgs = document.getElementById('lcChatMsgs');
+  const inp  = document.getElementById('lcChatInput');
+  const btn  = document.getElementById('lcSendBtn');
+  const dot  = document.querySelector('#lcChatBtn .dot');
+  const ctx  = '<%= f_ctx %>';
 
-  window.toggleFloatChat = function() {
-    chat.classList.toggle('open');
-    if (chat.classList.contains('open')) {
-      if (bdg) bdg.style.display = 'none';
+  window.lcToggleChat = function() {
+    box.classList.toggle('open');
+    if (box.classList.contains('open')) {
+      if (dot) dot.style.display = 'none';
       inp.focus();
       msgs.scrollTop = msgs.scrollHeight;
     }
   };
 
   function addMsg(text, isUser) {
-    var div = document.createElement('div');
-    div.className = 'fc-msg ' + (isUser ? 'user' : 'bot');
-    div.textContent = text;
-    msgs.appendChild(div);
+    const d = document.createElement('div');
+    d.className = 'cb-msg ' + (isUser ? 'user' : 'bot');
+    d.textContent = text;
+    msgs.appendChild(d);
     msgs.scrollTop = msgs.scrollHeight;
   }
 
-  window.sendFloatMsg = async function() {
-    var q = inp.value.trim();
-    if (!q || q.length === 0) { inp.focus(); return; }
-
+  window.lcSend = async function() {
+    const q = inp.value.trim();
+    if (!q) return;
     addMsg(q, true);
     inp.value = '';
     btn.disabled = true;
 
-    var typing = document.createElement('div');
-    typing.className = 'fc-msg bot';
-    typing.id = 'fc-typing';
-    typing.innerHTML = '<span class="spinner-grow spinner-grow-sm me-1"></span>Đang soạn...';
+    const typing = document.createElement('div');
+    typing.className = 'cb-msg bot';
+    typing.id = 'lc-typing';
+    typing.innerHTML = '<span style="opacity:.6">Đang soạn...</span>';
     msgs.appendChild(typing);
     msgs.scrollTop = msgs.scrollHeight;
 
     try {
-      var params = new URLSearchParams();
-      params.append('question', q);
-
-      var res = await fetch(ctx + '/student/ai-consult', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-        body: params.toString()
-      });
-
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      var data = await res.json();
-
-      var t = document.getElementById('fc-typing');
-      if (t) t.remove();
-
-      if (data.answer && data.answer.trim()) {
-        addMsg(data.answer, false);
-      } else if (data.error) {
-        addMsg('⚠ ' + data.error, false);
-      } else {
-        addMsg('⚠ Không nhận được câu trả lời từ AI.', false);
-      }
-    } catch (err) {
-      var t = document.getElementById('fc-typing');
-      if (t) t.remove();
-      addMsg('⚠ Lỗi kết nối: ' + err.message, false);
-      console.error('Chat error:', err);
+      const p = new URLSearchParams();
+      p.append('question', q);
+      const r = await fetch(ctx + '/student/ai-consult',
+        { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:p });
+      const data = await r.json();
+      document.getElementById('lc-typing')?.remove();
+      addMsg(data.answer || ('⚠ ' + (data.error || 'Lỗi không xác định')), false);
+    } catch(e) {
+      document.getElementById('lc-typing')?.remove();
+      addMsg('⚠ Lỗi kết nối: ' + e.message, false);
     } finally {
       btn.disabled = false;
       inp.focus();
     }
   };
-
-  inp.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendFloatMsg();
-    }
-  });
 })();
 </script>
-
 <% } %>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ── Dropdown user ── */
+function toggleDropdown(el) {
+  const dd = el.querySelector('.lc-dropdown');
+  if (!dd) return;
+  dd.classList.toggle('open');
+  document.addEventListener('click', function handler(e) {
+    if (!el.contains(e.target)) {
+      dd.classList.remove('open');
+      document.removeEventListener('click', handler);
+    }
+  });
+}
+
+/* ── Sidebar submenu ── */
+function toggleSubmenu(el, id) {
+  const sub = document.getElementById(id);
+  if (!sub) return;
+  const isOpen = sub.classList.contains('open');
+  // Đóng tất cả submenu khác
+  document.querySelectorAll('.lc-submenu').forEach(s => s.classList.remove('open'));
+  document.querySelectorAll('.lc-nav-item').forEach(n => n.classList.remove('expanded'));
+  // Toggle cái được click
+  if (!isOpen) {
+    sub.classList.add('open');
+    el.classList.add('expanded');
+  }
+}
+</script>
 
 </body>
 </html>
