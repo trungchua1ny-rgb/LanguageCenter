@@ -1,89 +1,175 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <%@ page import="com.langcenter.model.User" %>
 <%
-    // Khai báo lại với tên biến khác (s_...) để Eclipse không báo lỗi "cannot be resolved"
-    // và Tomcat cũng không báo lỗi trùng lặp khi gộp file.
     User s_user = (User) session.getAttribute("loggedUser");
     String s_role = (s_user != null) ? s_user.getRole() : "student";
-    String s_contextPath = request.getContextPath();
-    String s_uri = request.getRequestURI();
+    String s_ctx  = request.getContextPath();
+    String s_uri  = request.getRequestURI();
+
+    // Helper để check active
+    boolean isAdmin   = "admin".equals(s_role);
+    boolean isTeacher = "teacher".equals(s_role);
+    boolean isStudent = "student".equals(s_role);
 %>
 
-<style>
-  /* ── Sidebar ──────────────────────────────────────────────── */
-  #sidebar {
-    width: 230px; min-width: 230px; background: #fff;
-    border-right: 1px solid #e3e6f0; display: flex; flex-direction: column;
-    padding: 12px 0; overflow-y: auto;
-  }
-  .sidebar-section-label {
-    font-size: 10px; font-weight: 700; color: #adb5bd;
-    text-transform: uppercase; letter-spacing: 1px; padding: 14px 20px 4px;
-  }
-  .sidebar-link {
-    display: flex; align-items: center; gap: 10px; padding: 9px 20px;
-    font-size: 14px; color: #495057; text-decoration: none; border-radius: 0;
-    transition: background .15s, color .15s; border-left: 3px solid transparent;
-  }
-  .sidebar-link:hover { background: #f0f4ff; color: #1a73e8; }
-  .sidebar-link.active {
-    background: #e8f0fe; color: #1a73e8; font-weight: 600; border-left-color: #1a73e8;
-  }
-  .sidebar-link i { font-size: 17px; width: 20px; text-align: center; }
+<!-- ═══════════════════════════════════ SIDEBAR ═══════════════════════════════════ -->
+<nav id="lc-sidebar">
 
-  /* Mobile overlay */
-  @media (max-width: 768px) {
-    #sidebar {
-      position: fixed; left: -230px; top: 56px; height: calc(100vh - 56px);
-      z-index: 1025; transition: left .25s; box-shadow: 4px 0 16px rgba(0,0,0,.1);
-    }
-    #sidebar.show { left: 0; }
-  }
-</style>
+  <% if (isStudent) { %>
+  <%-- ══════════ STUDENT SIDEBAR ══════════ --%>
 
-<nav id="sidebar">
-
-  <div class="sidebar-section-label">Tổng quan</div>
-  <a href="<%= s_contextPath %>/admin/dashboard" class="sidebar-link <%= s_uri.contains("/dashboard") ? "active" : "" %>">
-    <i class="bi bi-grid-1x2"></i> Dashboard
+  <a href="<%= s_ctx %>/student/dashboard"
+     class="lc-nav-item <%= s_uri.contains("/student/dashboard") ? "active" : "" %>">
+    <i class="bi bi-grid-1x2"></i>
+    Tổng quan
   </a>
 
-  <% if ("admin".equals(s_role)) { %>
-  <div class="sidebar-section-label">Quản lý</div>
-  <a href="<%= s_contextPath %>/admin/users" class="sidebar-link <%= s_uri.contains("/admin/users") ? "active" : "" %>">
-    <i class="bi bi-people"></i> Người dùng
-  </a>
-  <a href="<%= s_contextPath %>/admin/courses" class="sidebar-link <%= s_uri.contains("/admin/courses") ? "active" : "" %>">
-    <i class="bi bi-book"></i> Khóa học
-  </a>
-  <a href="<%= s_contextPath %>/admin/classes" class="sidebar-link <%= s_uri.contains("/admin/classes") ? "active" : "" %>">
-    <i class="bi bi-door-open"></i> Lớp học
+  <!-- Khóa học (có submenu) -->
+  <div class="lc-nav-item <%= s_uri.contains("/student/courses") || s_uri.contains("/student/my-classes") ? "active expanded" : "" %>"
+       onclick="toggleSubmenu(this, 'sub-courses')">
+    <i class="bi bi-book"></i>
+    Khóa học
+    <i class="bi bi-chevron-right nav-arrow"></i>
+  </div>
+  <div class="lc-submenu <%= s_uri.contains("/student/courses") || s_uri.contains("/student/my-classes") ? "open" : "" %>"
+       id="sub-courses">
+    <a href="<%= s_ctx %>/student/my-classes"
+       class="<%= s_uri.contains("/student/my-classes") ? "active" : "" %>">
+      Khóa học của tôi
+    </a>
+    <a href="<%= s_ctx %>/student/courses"
+       class="<%= s_uri.contains("/student/courses") && !s_uri.contains("my-classes") ? "active" : "" %>">
+      Khóa học để xuất
+    </a>
+  </div>
+
+  <a href="<%= s_ctx %>/student/schedule"
+     class="lc-nav-item <%= s_uri.contains("/student/schedule") ? "active" : "" %>">
+    <i class="bi bi-calendar-week"></i>
+    Lịch học
   </a>
 
-  <% } else if ("teacher".equals(s_role)) { %>
-  <div class="sidebar-section-label">Giảng dạy</div>
-  <a href="<%= s_contextPath %>/teacher/classes" class="sidebar-link <%= s_uri.contains("/teacher/classes") ? "active" : "" %>">
-    <i class="bi bi-door-open"></i> Lớp của tôi
-  </a>
-  <a href="<%= s_contextPath %>/teacher/grades" class="sidebar-link <%= s_uri.contains("/teacher/grades") ? "active" : "" %>">
-    <i class="bi bi-patch-check"></i> Nhập điểm
+  <!-- Tài liệu học tập (có submenu) -->
+  <div class="lc-nav-item"
+       onclick="toggleSubmenu(this, 'sub-docs')">
+    <i class="bi bi-folder2-open"></i>
+    Tài liệu học tập
+    <i class="bi bi-chevron-right nav-arrow"></i>
+  </div>
+  <div class="lc-submenu" id="sub-docs">
+    <a href="#">Tất cả</a>
+    <a href="#">Tài liệu của tôi</a>
+  </div>
+
+  <a href="<%= s_ctx %>/student/grades"
+     class="lc-nav-item <%= s_uri.contains("/student/grades") ? "active" : "" %>">
+    <i class="bi bi-bar-chart-line"></i>
+    Điểm số
   </a>
 
-  <% } else { %>
-  <div class="sidebar-section-label">Học tập</div>
-  <a href="<%= s_contextPath %>/student/courses" class="sidebar-link <%= s_uri.contains("/student/courses") ? "active" : "" %>">
-    <i class="bi bi-book"></i> Khóa học
+  <!-- Phân cách -->
+  <div style="height:1px;background:var(--border);margin:8px 12px;"></div>
+
+  <a href="<%= s_ctx %>/student/ai-consult"
+     class="lc-nav-item <%= s_uri.contains("/student/ai-consult") ? "active" : "" %>">
+    <i class="bi bi-robot"></i>
+    Tư vấn AI lộ trình
   </a>
-  <a href="<%= s_contextPath %>/student/my-classes" class="sidebar-link <%= s_uri.contains("/student/my-classes") ? "active" : "" %>">
-    <i class="bi bi-journal-bookmark"></i> Lớp đã đăng ký
+
+  <a href="#" class="lc-nav-item">
+    <i class="bi bi-stars"></i>
+    Chấm điểm IELTS AI
   </a>
+
+  <a href="#" class="lc-nav-item">
+    <i class="bi bi-cpu"></i>
+    Chấm điểm TOEIC AI
+  </a>
+
+  <a href="#" class="lc-nav-item">
+    <i class="bi bi-pencil-square"></i>
+    Test online
+  </a>
+
+  <a href="#" class="lc-nav-item">
+    <i class="bi bi-newspaper"></i>
+    Tin tức và sự kiện
+  </a>
+
+  <!-- Phân cách -->
+  <div style="height:1px;background:var(--border);margin:8px 12px;"></div>
+
+  <!-- Góp ý (có submenu) -->
+  <div class="lc-nav-item"
+       onclick="toggleSubmenu(this, 'sub-support')">
+    <i class="bi bi-question-circle"></i>
+    Góp ý và yêu cầu hỗ trợ
+    <i class="bi bi-chevron-right nav-arrow"></i>
+  </div>
+  <div class="lc-submenu" id="sub-support">
+    <a href="#">Tất cả</a>
+    <a href="#">Tạo yêu cầu mới</a>
+    <a href="#">Báo lỗi</a>
+  </div>
+
+  <% } else if (isAdmin) { %>
+  <%-- ══════════ ADMIN SIDEBAR ══════════ --%>
+
+  <a href="<%= s_ctx %>/admin/dashboard"
+     class="lc-nav-item <%= s_uri.contains("/admin/dashboard") ? "active" : "" %>">
+    <i class="bi bi-grid-1x2"></i>
+    Tổng quan
+  </a>
+
+  <div style="padding:6px 16px 4px;font-size:10px;font-weight:700;
+              color:var(--text-light);letter-spacing:.8px;text-transform:uppercase;">
+    QUẢN LÝ
+  </div>
+
+  <a href="<%= s_ctx %>/admin/courses"
+     class="lc-nav-item <%= s_uri.contains("/admin/courses") ? "active" : "" %>">
+    <i class="bi bi-book"></i>
+    Khóa học
+  </a>
+
+  <a href="<%= s_ctx %>/admin/classes"
+     class="lc-nav-item <%= s_uri.contains("/admin/classes") ? "active" : "" %>">
+    <i class="bi bi-door-open"></i>
+    Lớp học
+  </a>
+
+  <a href="<%= s_ctx %>/admin/students"
+     class="lc-nav-item <%= s_uri.contains("/admin/students") ? "active" : "" %>">
+    <i class="bi bi-people"></i>
+    Học viên
+  </a>
+
+  <a href="<%= s_ctx %>/admin/enrollments"
+     class="lc-nav-item <%= s_uri.contains("/admin/enrollments") ? "active" : "" %>">
+    <i class="bi bi-card-checklist"></i>
+    Duyệt đăng ký
+  </a>
+
+  <div style="padding:6px 16px 4px;font-size:10px;font-weight:700;
+              color:var(--text-light);letter-spacing:.8px;text-transform:uppercase;">
+    HỌC VỤ
+  </div>
+
+  <a href="<%= s_ctx %>/admin/schedules"
+     class="lc-nav-item <%= s_uri.contains("/admin/schedules") ? "active" : "" %>">
+    <i class="bi bi-calendar3"></i>
+    Thời khóa biểu
+  </a>
+
+  <a href="<%= s_ctx %>/admin/grades"
+     class="lc-nav-item <%= s_uri.contains("/admin/grades") ? "active" : "" %>">
+    <i class="bi bi-award"></i>
+    Điểm số
+  </a>
+
   <% } %>
-
-  <div class="sidebar-section-label">Tài khoản</div>
-  <a href="<%= s_contextPath %>/profile" class="sidebar-link <%= s_uri.contains("/profile") ? "active" : "" %>">
-    <i class="bi bi-person-circle"></i> Hồ sơ cá nhân
-  </a>
 
 </nav>
 
-<div class="page-content">
+<!-- ═══════════════════════════════════ MAIN ═══════════════════════════════════ -->
+<main id="lc-main">

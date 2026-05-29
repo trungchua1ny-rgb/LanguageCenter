@@ -82,7 +82,9 @@ public class LoginServlet extends HttpServlet {
         // ── 5. Tạo session ───────────────────────────────────────────────────
         HttpSession session = req.getSession(true);   // tạo session mới
         session.setAttribute("loggedUser", user);
-        session.setMaxInactiveInterval(30 * 60);      // hết hạn sau 30 phút
+        session.setMaxInactiveInterval(30 * 60);// hết hạn sau 30 phút
+        
+        session.setAttribute("role", user.getRole()); //add session role
 
         // ── 6. Redirect theo role ────────────────────────────────────────────
         String contextPath = req.getContextPath();
